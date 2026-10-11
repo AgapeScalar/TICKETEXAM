@@ -1,0 +1,54 @@
+@model EXAM.Models.Ticket
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<div class="card mx-auto" style="max-width:800px;">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h3 class="card-title mb-0">@Model.Subject</h3>
+                <small class="text-muted">Ticket #@Model.Id — created @Model.CreatedAt.ToLocalTime().ToString("g")</small>
+            </div>
+            <div>
+                <span class="badge bg-@((Model.Priority==EXAM.Models.Priority.High)?"danger":(Model.Priority==EXAM.Models.Priority.Medium?"warning":"secondary")) me-2">@Model.Priority</span>
+                <span class="badge bg-@((Model.Status==EXAM.Models.TicketStatus.Open)?"success":(Model.Status==EXAM.Models.TicketStatus.InProgress?"info":"dark"))">@Model.Status</span>
+            </div>
+        </div>
+
+        <p class="card-text">@Model.Description</p>
+
+        <hr />
+
+        @if (!string.IsNullOrEmpty(Model.AttachmentUrl))
+        {
+            <div class="mb-3">
+                <label class="form-label">Attachment</label>
+                <div>
+                    <a href="@Model.AttachmentUrl" target="_blank" rel="noopener noreferrer">Open attachment</a>
+                </div>
+            </div>
+            <hr />
+        }
+
+        <form asp-action="ChangeStatus" method="post" class="d-flex gap-2">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <select name="status" class="form-select w-auto">
+                @foreach(var s in Enum.GetValues(typeof(EXAM.Models.TicketStatus)))
+                {
+                    if (s.Equals(Model.Status))
+                    {
+                        <option selected value="@s">@s</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@s</option>
+                    }
+                }
+            </select>
+            <button class="btn btn-primary" type="submit">Change status</button>
+            <a class="btn btn-outline-secondary" href="/Tickets">Back</a>
+        </form>
+    </div>
+</div>

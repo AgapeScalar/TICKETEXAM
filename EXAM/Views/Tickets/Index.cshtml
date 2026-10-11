@@ -1,0 +1,57 @@
+@model IEnumerable<EXAM.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Tickets";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3">Tickets</h1>
+    <a class="btn btn-primary" href="/Tickets/Create">Create new ticket</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No tickets yet — create the first one.</div>
+}
+
+<div class="row g-3">
+    @foreach (var t in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">@t.Subject</h5>
+                        <small class="text-muted">#@t.Id</small>
+                    </div>
+                    <p class="card-text text-truncate">@t.Description</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="badge bg-@((t.Priority==EXAM.Models.Priority.High)?"danger":(t.Priority==EXAM.Models.Priority.Medium?"warning":"secondary")) me-2">@t.Priority</span>
+                            <span class="badge bg-@((t.Status==EXAM.Models.TicketStatus.Open)?"success":(t.Status==EXAM.Models.TicketStatus.InProgress?"info":"dark"))">@t.Status</span>
+                        </div>
+                        <div>
+                            <small class="text-muted">@t.CreatedAt.ToLocalTime().ToString("g")</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a class="btn btn-sm btn-outline-primary" href="/Tickets/Details/@t.Id">Details</a>
+                    @if (!string.IsNullOrEmpty(t.AttachmentUrl))
+                    {
+                        <a class="btn btn-sm btn-outline-secondary ms-2" href="@t.AttachmentUrl" target="_blank" rel="noopener noreferrer">Attachment</a>
+                    }
+                </div>
+                @{
+                    var isNew = (DateTime.UtcNow - t.CreatedAt.ToUniversalTime()).TotalHours < 24;
+                }
+                @if (isNew)
+                {
+                    <div class="px-3 pb-3">
+                        <span class="badge bg-success">New</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
